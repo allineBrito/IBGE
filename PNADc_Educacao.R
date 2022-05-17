@@ -1,14 +1,14 @@
 library(tidyverse)
 library(PNADcIBGE)
-library(survey) #uso e modelos de dados de pesquisas amostrais (com pesos pÛs-estratificados e correÁ„o de vari‚ncia)
+library(survey) #uso e modelos de dados de pesquisas amostrais (com pesos p√≥s-estratificados e corre√ß√£o de vari√¢ncia)
 library(srvyr)
 library(dplyr)
-library(tidyverse) # manipulaÁ„o de dados
+library(tidyverse) # manipula√ß√£o de dados
 library(convey)
-library(dineq) # regressıes RIF
+library(dineq) # regress√µes RIF
 library(anamco)
 
-## conjunto inicial de dados/ # Vari·veis a serem lidas 
+## conjunto inicial de dados/ # Vari√°veis a serem lidas 
 dadosPNADc <- get_pnadc(year = 2021, quarter = 4, 
                         vars = c("Ano","Trimestre","UF","UPA","Estrato","V1027","V1028","V1029","posest",
                                  "V1008","V1014","V1022","V2001","V2003","V2005","V2007","V2009","V2010",
@@ -19,8 +19,8 @@ dadosPNADc <- get_pnadc(year = 2021, quarter = 4,
 
 options(scipen = 999) 
 
-##caracteristas da pop por raÁa cor e sexo
-totalsexo <- svymean(~V2007, dadosPNADc, na.rm = T) #proporÁ„o da populaÁ„o por sexo
+##caracteristas da pop por ra√ßa cor e sexo
+totalsexo <- svymean(~V2007, dadosPNADc, na.rm = T) #propor√ß√£o da popula√ß√£o por sexo
 pop_raca_ou_cor <- svytotal(x=~interaction(V2010, V2007), design=dadosPNADc, na.rm=TRUE)
 
 
@@ -31,23 +31,23 @@ Faixaetaria15_29 <- svytotal(x=~interaction(V2007, V2009%in% c(15:29)), design=d
 Faixaetaria30_59 <- svytotal(x=~interaction(V2007, V2009%in% c(30:59)), design=dadosPNADc, na.rm=TRUE)
 Faixaetaria60oumais <- svytotal(x=~interaction(V2007, V2009%in% c(60:100)), design=dadosPNADc, na.rm=TRUE)
 
-#CondiÁ„o no domicÌlio
-FamÌlia_chefiada_pela_m„e2 <- svytotal(~V2005, dadosPNADc, na.rm = T)
+#Condi√ß√£o no domic√≠lio
+Fam√≠lia_chefiada_pela_m√£e2 <- svytotal(~V2005, dadosPNADc, na.rm = T)
 
-FamÌlia_chefiada_pela_m„e_sexo <- svytotal(~interaction(V2005, V2007), dadosPNADc, na.rm = T, type='html')
+Fam√≠lia_chefiada_pela_m√£e_sexo <- svytotal(~interaction(V2005, V2007), dadosPNADc, na.rm = T, type='html')
 
 
-##educaÁ„o
+##educa√ß√£o
 
-#N„o sabe ler e escreber por sexo e raÁa ou cor
-svytotal(~V3001=="N„o"|V2010=="Parda"|V2010=="Preta" | V2007=="Mulher" , dadosPNADc, na.rm= T)
-svyby(~V3001=="N„o"|V2010=="Parda"| V2010=="Preta" |V2007=="Mulher", ~UF, dadosPNADc, svytotal, na.rm= T, vartype = "cv")
+#N√£o sabe ler e escreber por sexo e ra√ßa ou cor
+svytotal(~V3001=="N√£o"|V2010=="Parda"|V2010=="Preta" | V2007=="Mulher" , dadosPNADc, na.rm= T)
+svyby(~V3001=="N√£o"|V2010=="Parda"| V2010=="Preta" |V2007=="Mulher", ~UF, dadosPNADc, svytotal, na.rm= T, vartype = "cv")
 
 svytotal(~V3001, subset(dadosPNADc, V2009 >= 15 & V2009 <= 29), na.rm=T)
-svytotal(~V3001=="N„o", subset(dadosPNADc, V2009 > 60), na.rm=T)
+svytotal(~V3001=="N√£o", subset(dadosPNADc, V2009 > 60), na.rm=T)
 
 
-#crianÁas matriculadas em creches
+#crian√ßas matriculadas em creches
 svytotal(~V3002=="Sim", subset(dadosPNADc, V2009 >= 4 & V2009 <= 5), na.rm=T)
 svyby(~V3002=="Sim",~V2009 >= 4 & V2009 <= 5, subset(dadosPNADc, V2010=="Preta"|V2010=="Parda"), svymean, na.rm=T)
 
@@ -56,14 +56,14 @@ svyby(~V3002=="Sim",~V2009 >= 0 & V2009 <= 3, subset(dadosPNADc, V2010=="Preta"|
 
 
 #superior
-svytotal(~V3003A=="Superior - graduaÁ„o" , dadosPNADc, na.rm=T)
+svytotal(~V3003A=="Superior - gradua√ß√£o" , dadosPNADc, na.rm=T)
 
-svytotal(~V3003A=="Superior - graduaÁ„o", subset(dadosPNADc, 
+svytotal(~V3003A=="Superior - gradua√ß√£o", subset(dadosPNADc, 
                                                  V2009 >= 15 & V2009 <= 29 |V2010=="Parda"|V2010=="Preta" | V2007=="Mulher"), na.rm=T)
 grau <- svytotal(~interaction(V2009 >= 15 & V2009 <= 29, V3003A), dadosPNADc, na.rm = T)
 
 
-#renda por grau de instruÁ„o
+#renda por grau de instru√ß√£o
 mediaRendaEduc = svyby(~VD4020, ~VD3004, dadosPNADc, svymean, na.rm=T)
 mediaRendaEduc %>%
   ggplot(aes(x=VD4020, y=VD3004))+
@@ -72,8 +72,8 @@ mediaRendaEduc %>%
 
 
 ##trablho e renda
-mediaRendaUFRaÁa <- svyby(~VD4020, ~V2010, dadosPNADc, svymean, na.rm = TRUE)
-mediaRendaUFRaÁa %>%
+mediaRendaUFRa√ßa <- svyby(~VD4020, ~V2010, dadosPNADc, svymean, na.rm = TRUE)
+mediaRendaUFRa√ßa %>%
   ggplot(aes(x=VD4020, y=V2010))+
   geom_bar(stat='identity', colour='lightblue', fill='lightblue')
 
