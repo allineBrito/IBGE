@@ -4,4 +4,4 @@
 SIGLAS:
 PNS - Pesquisa Nacional de Saúde;
 
-PNADc - Pesquisa Nacional por Amostra de Domicílios Contínua
+PNADc - Pesquisa Nacional por Amostra de Domicílios Contínua.
